@@ -574,7 +574,7 @@ function onOpen() {
   
   machineConfiguration.setDescription("M760/M761");
   machineConfiguration.setVendor("YOU JI");
-  machineConfiguration.setModel("YV-320EL/R C");
+  //machineConfiguration.setModel("YV-320EL/R C");
   
   // gPolarModal.format(getCode("DISABLE_Y_AXIS", true));
   yOutput.disable();
