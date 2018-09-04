@@ -356,6 +356,15 @@ function onOpen() {
     }
   }
 
+  //stock - workpiece
+  var workpiece = getWorkpiece();
+  var delta = Vector.diff(workpiece.upper, workpiece.lower);
+  
+  if (delta.isNonZero()) {
+    writeComment("STOCK MIN X" + xyzFormat.format(workpiece.lower.x) + " Y" + xyzFormat.format(workpiece.lower.y) + " Z" + xyzFormat.format(workpiece.lower.z));
+    writeComment("STOCK MAX X" + xyzFormat.format(workpiece.upper.x) + " Y" + xyzFormat.format(workpiece.upper.y) + " Z" + xyzFormat.format(workpiece.upper.z));
+  }
+
   // dump tool information
   if (properties.writeTools) {
     var zRanges = {};
@@ -1204,11 +1213,14 @@ function onSection() {
       }
     } else {
       if (Comp == "control"){
-      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment+ " " +dFormat.format(tool.diameterOffset) + ")");
+      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "(TOOL" + " T" + toolFormat.format(tool.number) + " \"" +
+      getParameter("operation:tool_type").toUpperCase() + "\" D="  + toolDescFormat.format(getParameter("operation:tool_diameter")) + " CR=" + toolDescFormat.format(getParameter("operation:tool_cornerRadius")) + 
+      " A=" + toolDescFormat.format(getParameter("operation:tool_taperAngle")*2) + " FL=" + toolDescFormat.format(getParameter("operation:tool_fluteLength")) + " SL=" +  toolDescFormat.format(getParameter("operation:tool_overallLength")) + 
+      " BL=" + toolDescFormat.format(getParameter("operation:tool_bodyLength")) +  " AD=" +  toolDescFormat.format(getParameter("operation:tool_shaftDiameter")) + " UI" + " " + dFormat.format(tool.diameterOffset) + ")");
     } else {
       writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "(TOOL" + " T" + toolFormat.format(tool.number) + " \"" +
        getParameter("operation:tool_type").toUpperCase() + "\" D="  + toolDescFormat.format(getParameter("operation:tool_diameter")) + " CR=" + toolDescFormat.format(getParameter("operation:tool_cornerRadius")) + 
-       " A=" + toolDescFormat.format(getParameter("operation:tool_taperAngle")) + " FL=" + toolDescFormat.format(getParameter("operation:tool_fluteLength")) + " SL=" +  toolDescFormat.format(getParameter("operation:tool_overallLength")) + 
+       " A=" + toolDescFormat.format(getParameter("operation:tool_taperAngle")*2) + " FL=" + toolDescFormat.format(getParameter("operation:tool_fluteLength")) + " SL=" +  toolDescFormat.format(getParameter("operation:tool_overallLength")) + 
        " BL=" + toolDescFormat.format(getParameter("operation:tool_bodyLength")) +  " AD=" +  toolDescFormat.format(getParameter("operation:tool_shaftDiameter")) + " UI)");
     }
     }
