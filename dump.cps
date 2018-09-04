@@ -4,8 +4,8 @@
 
   Dump configuration.
 
-  $Revision: 41602 8a235290846bfe71ead6a010711f4fc730f48827 $
-  $Date: 2017-09-14 12:16:32 $
+  $Revision: 42020 a20cdb5530b7a5b3e441ecf55e3eebdd06fd6cd5 $
+  $Date: 2018-06-18 18:34:01 $
   
   FORKID {4E9DFE89-DA1C-4531-98C9-7FECF672BD47}
 */
@@ -210,6 +210,10 @@ function onSectionSpecialCycle() {
 
 function onPower() {
   dump("onPower", arguments);
+}
+
+function onProbe() {
+  dump("onProbe", arguments);
 }
 
 function onSpindleSpeed() {
