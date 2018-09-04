@@ -43,7 +43,6 @@ highFeedrate = (unit == IN) ? 100 : 5000;
 // user-defined properties
 properties = {
   writeMachine: false, // write machine
-  preloadTool: false, // preloads next tool on tool change if any
   showSequenceNumbers: true, // show sequence numbers
   sequenceNumberStart: 10, // first sequence number
   sequenceNumberIncrement: 1, // increment for sequence numbers
@@ -803,30 +802,6 @@ function onSection() {
     writeBlock("T" + toolFormat.format(tool.number * 100 + compensationOffset), ((tool.spindleRPM < 700 ? mFormat.format(41) : mFormat.format(42))));  // spindle gear selection NN
     if (tool.comment) {
       writeComment(tool.comment);
-    }
-
-    if (properties.preloadTool) {
-      var nextTool = getNextTool(tool.number);
-      if (nextTool) {
-        var compensationOffset = nextTool.isTurningTool() ? nextTool.compensationOffset : nextTool.lengthOffset;
-        if (compensationOffset > 99) {
-          error(localize("Compensation offset is out of range."));
-          return;
-        }
-        writeBlock("T" + toolFormat.format(nextTool.number * 100 + compensationOffset), ((tool.spindleRPM < 700 ? mFormat.format(41) : mFormat.format(42))));  // spindle gear selection NN
-      } else {
-        // preload first tool
-        var section = getSection(0);
-        var firstTool = section.getTool().number;
-        if (tool.number != firstTool.number) {
-          var compensationOffset = firstTool.isTurningTool() ? firstTool.compensationOffset : firstTool.lengthOffset;
-          if (compensationOffset > 99) {
-            error(localize("Compensation offset is out of range."));
-            return;
-          }
-          writeBlock("T" + toolFormat.format(firstTool.number * 100 + compensationOffset), ((tool.spindleRPM < 700 ? mFormat.format(41) : mFormat.format(42))));
-        }
-      }
     }
     if (tool.manualToolChange || properties.manualToolChange) {
       onCommand(COMMAND_STOP);
@@ -1680,9 +1655,9 @@ function onClose() {
   onCommand(COMMAND_COOLANT_OFF);
 
   // we might want to retract in Z before X
-  writeBlock(gFormat.format(53), gMotionModal.format(0), "X" + xFormat.format(0)); // retract
+  writeBlock(gFormat.format(53), gMotionModal.format(0), "X" + xFormat.format(properties.g53HomePositionX)); // retract
   xOutput.reset();
-  writeBlock(gFormat.format(53), gMotionModal.format(0), "Z" + zFormat.format(0)); // retract
+  writeBlock(gFormat.format(53), gMotionModal.format(0), "Z" + zFormat.format(properties.g53HomePositionZ)); // retract
   zOutput.reset();
 
 
