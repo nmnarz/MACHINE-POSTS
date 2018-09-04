@@ -139,6 +139,7 @@ var secFormat = createFormat({decimals:3, forceDecimal:true}); // seconds - rang
 var milliFormat = createFormat({decimals:0}); // milliseconds // range 1-9999
 var taperFormat = createFormat({decimals:1, scale:DEG});
 var oFormat = createFormat({width:4, zeropad:true, decimals:0});
+var toolDescFormat = createFormat({decimals:3, forceDecimal: false})
 
 var xOutput = createVariable({prefix:"X"}, xyzFormat);
 var yOutput = createVariable({prefix:"Y"}, xyzFormat);
@@ -1197,7 +1198,7 @@ function onSection() {
     var Comp = hasParameter("operation:compensationType") ? getParameter("operation:compensationType") : " ";
     if (properties.parametricTools) {
     if (Comp == "control"){
-        writeBlock("T#" + toolFormat.format(tool.number + 500), mFormat.format(6), "("+tool.comment+ " " + (properties.parametricTools ? ("D#" + (d + 500))  : dOutput.format(tool.diameterOffset)) + ")");
+        writeBlock("T#" + toolFormat.format(tool.number + 500), mFormat.format(6), "(TOOL"+ getParameter("operation:tool_type") + tool.comment+ " " + (properties.parametricTools ? ("D#" + (d + 500))  : dOutput.format(tool.diameterOffset)) + ")");
       } else {
         writeBlock("T#" + toolFormat.format(tool.number + 500), mFormat.format(6), "("+tool.comment + ")");
       }
@@ -1205,7 +1206,10 @@ function onSection() {
       if (Comp == "control"){
       writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment+ " " +dFormat.format(tool.diameterOffset) + ")");
     } else {
-      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment + ")");
+      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "(TOOL" + " T" + toolFormat.format(tool.number) + " \"" +
+       getParameter("operation:tool_type").toUpperCase() + "\" D="  + toolDescFormat.format(getParameter("operation:tool_diameter")) + " CR=" + toolDescFormat.format(getParameter("operation:tool_cornerRadius")) + 
+       " A=" + toolDescFormat.format(getParameter("operation:tool_taperAngle")) + " FL=" + toolDescFormat.format(getParameter("operation:tool_fluteLength")) + " SL=" +  toolDescFormat.format(getParameter("operation:tool_overallLength")) + 
+       " BL=" + toolDescFormat.format(getParameter("operation:tool_bodyLength")) +  " AD=" +  toolDescFormat.format(getParameter("operation:tool_shaftDiameter")) + " UI)");
     }
     }
     var showToolZMin = false;
