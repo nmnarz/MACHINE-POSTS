@@ -76,7 +76,7 @@ properties = {
   g53HomePositionZ: 0, // home position for Z-axis
   g53HomePositionSubZ: 0, // home Position for Z when the operation uses the Secondary Spindle
   transferType: "Phase", // Phase, Speed, or Stop synchronization for stock-transfer
-  optimizeCaxisSelect: true, // optimize output of enable/disable C-axis codes
+  optimizeCaxisSelect: false, // optimize output of enable/disable C-axis codes
   transferUseTorque: false, // use torque control for stock-transfer
   looping: false, //output program for M98 looping
   numberOfRepeats: 1, //how many times to loop program
@@ -197,7 +197,6 @@ var gPolarModal = createModal({}, g1Format); // G12.1, G13.1
 var cAxisEngageModal = createModal({}, mFormat);
 var cAxisBrakeModal = createModal({}, mFormat);
 var mInterferModal = createModal({}, mFormat);
-var cAxisEnableModal = createModal({}, mFormat);
 var tailStockModal = createModal({}, mFormat);
 
 // fixed settings
@@ -1289,8 +1288,8 @@ function onSection() {
         forceUnlockMultiAxis();
         onCommand(COMMAND_UNLOCK_MULTI_AXIS);
         if ((tempSpindle != SPINDLE_LIVE) && !properties.optimizeCaxisSelect) {
-          cAxisEnableModal.reset();
-          writeBlock(cAxisEnableModal.format(getCode("DISABLE_C_AXIS", getSpindle(true))));
+          cAxisEngageModal.reset();
+          writeBlock(cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true))));
         }
       } else {
         goHome(true);
@@ -1399,12 +1398,12 @@ function onSection() {
       }
       gPlaneModal.reset();
       if (!properties.optimizeCaxisSelect) {
-        cAxisEnableModal.reset();
+        cAxisEngageModal.reset();
       }
       // writeBlock(wcsOut, mFormat.format(getCode("SET_SPINDLE_FRAME", getSpindle(true))));
       writeBlock(wcsOut);
       writeBlock(feedMode, gPlaneModal.format(plane));
-      writeBlock(cAxisEnableModal.format(getCode("ENABLE_C_AXIS", getSpindle(true)))); // moved to it's own line to run as subprogram NN
+      writeBlock(cAxisEngageModal.format(getCode("ENABLE_C_AXIS", getSpindle(true)))); // moved to it's own line to run as subprogram NN
       writeBlock(gMotionModal.format(0), gFormat.format(28), "H" + abcFormat.format(0)); // unwind c-axis
       // writeBlock(gFormat.format(50), "C" + abcFormat.format(0));
       if (!machineState.usePolarMode && !machineState.useXZCMode && !currentSection.isMultiAxis()) {
@@ -1423,11 +1422,11 @@ function onSection() {
       onCommand(COMMAND_UNLOCK_MULTI_AXIS);
       gPlaneModal.reset();
       if (!properties.optimizeCaxisSelect) {
-        cAxisEnableModal.reset();
+        cAxisEngageModal.reset();
       }
       writeBlock(wcsOut);
       writeBlock(feedMode, gPlaneModal.format(18));
-      writeBlock(cAxisEnableModal.format(getCode("DISABLE_C_AXIS", getSpindle(true)))); // moved to it's own line to run as subprogram NN
+      writeBlock(cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true)))); // moved to it's own line to run as subprogram NN
     } else {
       writeBlock(feedMode);
     }
@@ -2689,9 +2688,9 @@ function onCycle() {
       }
       gPlaneModal.reset();
       if (!properties.optimizeCaxisSelect) {
-        cAxisEnableModal.reset();
+        cAxisEngageModal.reset();
       }
-      writeBlock(feedMode, gPlaneModal.format(18), cAxisEnableModal.format(getCode("DISABLE_C_AXIS", getSpindle(true))));
+      writeBlock(feedMode, gPlaneModal.format(18), cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true))));
     }
     
     switch (cycleType) {
@@ -3412,13 +3411,13 @@ function ejectPart() {
   goHome(false); // Position all axes to home position
   writeBlock(mFormat.format(getCode("UNLOCK_MULTI_AXIS", getSpindle(true))));
   if (!properties.optimizeCaxisSelect) {
-    cAxisEnableModal.reset();
+    cAxisEngageModal.reset();
   }
   writeBlock(
     gFeedModeModal.format(getCode("FEED_MODE_MM_MIN", getSpindle(false))),
     gFormat.format(53 + currentWorkOffset),
     gPlaneModal.format(17),
-    cAxisEnableModal.format(getCode("DISABLE_C_AXIS", getSpindle(true)))
+    cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true)))
   );
   setCoolant(COOLANT_THROUGH_TOOL);
   gSpindleModeModal.reset();
@@ -3470,7 +3469,7 @@ function onSectionEnd() {
   }
 
   // cancel SFM mode to preserve spindle speed
-  if (currentSection.getTool().getSpindleMode() == SPINDLE_CONSTANT_SURFACE_SPEED) {
+  if ((currentSection.getTool().getSpindleMode() == SPINDLE_CONSTANT_SURFACE_SPEED) && !stockTransferIsActive) {
     startSpindle(false, true, getFramePosition(currentSection.getFinalPosition()));
   }
 
@@ -3548,8 +3547,10 @@ function onClose() {
     retractSubSpindle();
   }
 
-  //if (liveTool) {
-  if (true) { // force home C axis NN
+  if (!properties.optimizeCaxisSelect) {
+    cAxisEngageModal.reset();
+  }
+  if (liveTool) {
     writeBlock(cAxisEngageModal.format(getCode("ENABLE_C_AXIS", getSpindle(true))));
     writeBlock(gFormat.format(28), "H" + abcFormat.format(0)); // unwind
     // writeBlock(gFormat.format(50), "C" + abcFormat.format(0));
