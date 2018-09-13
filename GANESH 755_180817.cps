@@ -1133,7 +1133,7 @@ function onSection() {
     (!machineConfiguration.isMultiAxisConfiguration() && currentSection.isMultiAxis()) ||
     (!getPreviousSection().isMultiAxis() && currentSection.isMultiAxis()); // force newWorkPlane between indexing and simultaneous operations
   var forceSmoothing =  properties.useSmoothing &&
-    (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") ||
+    (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") || 
     !isFirstSection() && getPreviousSection().hasParameter("operation-strategy") && (getPreviousSection().getParameter("operation-strategy") == "drill")); // force smoothing in case !insertToolCall (2d chamfer)
   if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
     
