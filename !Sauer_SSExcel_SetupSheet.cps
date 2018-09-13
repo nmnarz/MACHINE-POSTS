@@ -413,7 +413,7 @@ function onSection() {
   if (!isProbeOperation(currentSection)) {
     var Comp = hasParameter("operation:compensationType") ? getParameter("operation:compensationType") : " ";
     var dComp;
-
+    
     if (Comp == "control"){         
       dComp = "D" + tool.diameterOffset + ", ";
     }else {
