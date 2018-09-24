@@ -30,9 +30,10 @@ minimumChordLength = spatial(0.25, MM);
 minimumCircularRadius = spatial(0.01, MM);
 maximumCircularRadius = spatial(1000, MM);
 minimumCircularSweep = toRad(0.01);
-maximumCircularSweep = toRad(180);
+maximumCircularSweep = toRad(360);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
+allowSpiralMoves = true;
 
 
 
@@ -41,7 +42,7 @@ properties = {
   writeMachine: true, // write machine
   writeTools: true, // writes the tools
   preloadTool: true, // preloads next tool on tool change if any
-  showSequenceNumbers: false, // show sequence numbers
+  showSequenceNumbers: true, // show sequence numbers
   sequenceNumberStart: 10, // first sequence number
   sequenceNumberIncrement: 10, // increment for sequence numbers
   optionalStop: true, // optional stop
@@ -200,6 +201,7 @@ var cycleSubprogramIsActive = false;
 var patternIsActive = false;
 var lastOperationComment = "";
 var sequenceNumberForToolChange;
+var maximumCircularRadiiDifference = toPreciseUnit(0.005, MM);
 
 /**
   Writes the specified block.
@@ -1094,7 +1096,7 @@ function onSection() {
   var insertToolCall = forceToolAndRetract || isFirstSection() ||
     currentSection.getForceToolChange && currentSection.getForceToolChange() ||
     (tool.number != getPreviousSection().getTool().number);
-  //insertToolCall = true; //always post tool change for operations
+  insertToolCall = true; //always post tool change for operations
 
   var zIsOutput = false; // true if the Z-position has been output, used for patterns
 
@@ -2197,6 +2199,16 @@ function onLinear5D(_x, _y, _z, _a, _b, _c, feed) {
 }
 
 function onCircular(clockwise, cx, cy, cz, x, y, z, feed) {
+  if (isSpiral()) {
+    var startRadius = getCircularStartRadius();
+    var endRadius = getCircularRadius();
+    var dr = Math.abs(endRadius - startRadius);
+    if (dr > maximumCircularRadiiDifference) { // maximum limit
+      linearize(tolerance); // or alternatively use other G-codes for spiral motion
+      return;
+    }
+  }
+  
   if (pendingRadiusCompensation >= 0) {
     error(localize("Radius compensation cannot be activated/deactivated for a circular move."));
     return;
