@@ -1215,11 +1215,12 @@ function onCyclePoint(x, y, z) {
       // K is retract amount
       writeBlock(
         gPlaneModal.format(17), gAbsIncModal.format(90), gCycleModal.format((tool.type == TOOL_TAP_LEFT_HAND ? 273 : 283)),
-        gFeedModeModal.format(95), // feed per revolution
+        //gFeedModeModal.format(95), // feed per revolution
         getCommonCycle(x, y, z, cycle.retract),
         conditional(P > 0, "P" + secFormat.format(P/1000.0)),
         "Q" + xyzFormat.format(cycle.incrementalDepth),
         "F" + pitchFormat.format((gFeedModeModal.getCurrent() == 95) ? tool.getThreadPitch() : F), // for G95 F is pitch, for G94 F is pitch*spindle rpm
+        //feedOutput.format(F),
         sOutput.format(tool.spindleRPM),
         "E0", // spindle position
         mFormat.format(53)
