@@ -55,7 +55,7 @@ properties = {
   useFixtureOffsetFunction: true, // specifies to use CALL OO88 for 3+1 machining
   autoset: "Triangle", //Select pallet
   autosetNumber: 20, //First used Autoset number
-  autosetBAngle: 210, //sets the B angle rotation for all autosets
+  autosetBAngle: 0, //sets the B angle rotation for all autosets
   repeatAutoset: 2, //How many autosets are used at top of program
 
 };
@@ -362,6 +362,13 @@ function onOpen() {
         return;
       }
     }
+  }
+  
+  if (properties.useFixtureOffsetFunction){
+    writeBlock("VZOFX[200]=0.");
+    writeBlock("VZOFY[200]=0.");
+    writeBlock("VZOFZ[200]=-9.840");
+    writeBlock("VZOFB[200]=" + properties.autosetBAngle);  
   }
 
   for (var i = 0; i < properties.repeatAutoset; i++) {
@@ -704,6 +711,7 @@ function onSection() {
   var insertToolCall = forceToolAndRetract || isFirstSection() ||
     currentSection.getForceToolChange && currentSection.getForceToolChange() ||
     (tool.number != getPreviousSection().getTool().number);
+    insertToolCall = true; //always post tool change for operations
   
   retracted = false; // specifies that the tool has been retracted to the safe plane
   var newWorkOffset = isFirstSection() ||
@@ -1039,7 +1047,8 @@ function onCyclePoint(x, y, z) {
       error(localize("Work offset is out of range."));
       return;
     } else {
-      probeWorkOffsetCode = workOffset + "."; // G54->G59
+      //probeWorkOffsetCode = workOffset + "."; // G54->G59
+      probeWorkOffsetCode = properties.useFixtureOffsetFunction ? "200." : workOffset + "."; // G54->G59
     }
   }
 
