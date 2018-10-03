@@ -33,7 +33,7 @@ minimumCircularSweep = toRad(0.01);
 maximumCircularSweep = toRad(360);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
-allowSpiralMoves = true;
+allowSpiralMoves = false;
 
 
 
@@ -53,7 +53,7 @@ properties = {
   forceIJK: true, // force output of IJK for G2/G3 when not using R word
   useParametricFeed: false, // specifies that feed should be output using Q values
   showNotes: false, // specifies that operation notes should be output
-  useSmoothing: false, // specifies if smoothing should be used or not
+  useSmoothing: true, // specifies if smoothing should be used or not
   usePitchForTapping: false, // enable to use pitch instead of feed for the F-word for canned tapping cycles - note that your CNC control must be setup for pitch mode!
   useG95: false, // use IPR/MPR instead of IPM/MPM
   useG28: false, // specifies that G28 should be used instead of G53
@@ -61,7 +61,8 @@ properties = {
   useSubroutines: false, // specifies that subroutines per each operation should be generated
   useSubroutinePatterns: false, // generates subroutines for patterned operation
   useSubroutineCycles: false, // generates subroutines for cycle operations on same holes
-  useRigidTapping: "no" // output rigid tapping block
+  useRigidTapping: "no", // output rigid tapping block
+  fanTable: true, // fan table off
 };
 
 // user-defined property definitions
@@ -97,7 +98,8 @@ propertyDefinitions = {
       {title:"No", id:"no"},
       {title:"Without spindle direction", id:"without"}
     ]
-  }
+  },
+  fanTable: {title:"Fan table EOP", description:"Fans table off at the end of program", type:"boolean"},
 };
 
 // samples:
@@ -201,7 +203,7 @@ var cycleSubprogramIsActive = false;
 var patternIsActive = false;
 var lastOperationComment = "";
 var sequenceNumberForToolChange;
-var maximumCircularRadiiDifference = toPreciseUnit(0.005, MM);
+var maximumCircularRadiiDifference = toPreciseUnit(0.001, MM);
 
 /**
   Writes the specified block.
@@ -429,6 +431,9 @@ if (programName) {
   //Start chip flush
   writeBlock(mFormat.format(15));
 
+  //Look ahead ON
+  writeBlock(gFormat.format(8), "P1")
+
   // absolute coordinates and feed per min
   writeBlock(gAbsIncModal.format(90), gFeedModeModal.format(properties.useG95 ? 95 : 94), gPlaneModal.format(17), gFormat.format(49), gFormat.format(40), gFormat.format(80));
 
@@ -511,7 +516,7 @@ function setSmoothing(mode) {
   validate(!lengthCompensationActive, "Length compensation is active while trying to update smoothing.");
 
   currentSmoothing = mode;
-  writeBlock(gFormat.format(5.1), mode ? "Q1" : "Q0");
+  writeBlock(gFormat.format(5.1), mode ? "Q1 R4" : "Q0");
   return true;
 }
 
@@ -1107,7 +1112,7 @@ function onSection() {
     (currentSection.isOptimizedForMachine() && getPreviousSection().isOptimizedForMachine() &&
       Vector.diff(getPreviousSection().getFinalToolAxisABC(), currentSection.getInitialToolAxisABC()).length > 1e-4) ||
     (!machineConfiguration.isMultiAxisConfiguration() && currentSection.isMultiAxis()) ||
-    (!getPreviousSection().isMultiAxis() && currentSection.isMultiAxis()); // force newWorkPlane between indexing and simultaneous operations
+    (!getPreviousSection().isMultiAxis() && currentSection.isMultiAxis()); // force newWorkPlane between indexing and simultaneous operations  
   var forceSmoothing =  properties.useSmoothing &&
     (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") ||
     !isFirstSection() && getPreviousSection().hasParameter("operation-strategy") && (getPreviousSection().getParameter("operation-strategy") == "drill")); // force smoothing in case !insertToolCall (2d chamfer)
@@ -1292,7 +1297,13 @@ function onSection() {
   var abc = defineWorkPlane(currentSection, true);
 
   if (properties.useSmoothing) {
-    if (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "drill")) {
+    if ((hasParameter("operation-strategy") && (getParameter("operation-strategy") != "drill")) && 
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "face")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "contour2d")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "pocket2d")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "slot")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "circular")) &&      
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "bore")))  {
       if (setSmoothing(true)) {
         // we force G43 using lengthCompensationActive
       }
@@ -2592,9 +2603,16 @@ function onClose() {
 
   onCommand(COMMAND_COOLANT_OFF);
 
+  //Look ahead OFF
+  writeBlock(gFormat.format(8), "P0");
+
   writeRetract(Z); // retract
   
   disableLengthCompensation(true);
+
+  if (properties.fanTable){
+    writeBlock("G98 P1011");
+  }
   setSmoothing(false);
   zOutput.reset();
 
