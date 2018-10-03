@@ -644,6 +644,15 @@ function onOpen() {
     }
   }
 
+  //stock - workpiece
+  var workpiece = getWorkpiece();
+  var delta = Vector.diff(workpiece.upper, workpiece.lower);
+  
+  if (delta.isNonZero()) {
+    writeComment("STOCK MIN X" + yFormat.format(workpiece.lower.x) + " Y" + yFormat.format(workpiece.lower.y) + " Z" + zFormat.format(workpiece.lower.z));
+    writeComment("STOCK MAX X" + yFormat.format(workpiece.upper.x) + " Y" + yFormat.format(workpiece.upper.y) + " Z" + zFormat.format(workpiece.upper.z));
+  }  
+
   // dump tool information
   if (properties.writeTools) {
     var zRanges = {};
