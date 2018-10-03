@@ -261,7 +261,7 @@ function onOpen() {
   gRotationModal.format(69); // Default to G69 Rotation Off
 
   if (true) { // note: setup your machine here
-    var aAxis = createAxis({coordinate:0, table:false, axis:[1, 0, 0], range:[-360, 360], preference:1});
+    var aAxis = createAxis({coordinate:0, table:false, axis:[1, 0, 0], range:[-360, 360], preference:0});
     //var cAxis = createAxis({coordinate:2, table:false, axis:[0, 0, 1], range:[-360, 360], preference:1});
     machineConfiguration = new MachineConfiguration(aAxis);
 
@@ -347,7 +347,16 @@ function onOpen() {
     if (model) {
       //writeComment(localize("model") + ": " + model);
     }
-    }
+  }
+
+  //stock - workpiece
+  var workpiece = getWorkpiece();
+  var delta = Vector.diff(workpiece.upper, workpiece.lower);
+  
+  if (delta.isNonZero()) {
+    writeComment("STOCK MIN X" + xyzFormat.format(workpiece.lower.x) + " Y" + xyzFormat.format(workpiece.lower.y) + " Z" + xyzFormat.format(workpiece.lower.z));
+    writeComment("STOCK MAX X" + xyzFormat.format(workpiece.upper.x) + " Y" + xyzFormat.format(workpiece.upper.y) + " Z" + xyzFormat.format(workpiece.upper.z));
+  }
 
   // dump tool information
   if (properties.writeTools) {
@@ -899,7 +908,7 @@ function subprogramDefine(_initialPosition, _abc, _retracted, _zIsOutput) {
       patternIsActive = true;
 
       if (firstPattern) {
-        subprogramStart(_initialPosition, _abc, true);
+        subprogramStart(_initialPosition, _abc, false);
       } else {
         skipRemainingSection();
         setCurrentPosition(getFramePosition(currentSection.getFinalPosition()));
@@ -1088,7 +1097,7 @@ function onSection() {
   var insertToolCall = forceToolAndRetract || isFirstSection() ||
     currentSection.getForceToolChange && currentSection.getForceToolChange() ||
     (tool.number != getPreviousSection().getTool().number);
-  //insertToolCall = true; //always post tool change for operations
+  insertToolCall = true; //always post tool change for operations
 
   var zIsOutput = false; // true if the Z-position has been output, used for patterns
 
