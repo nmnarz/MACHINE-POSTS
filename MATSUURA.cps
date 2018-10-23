@@ -53,7 +53,7 @@ properties = {
   forceIJK: true, // force output of IJK for G2/G3 when not using R word
   useParametricFeed: false, // specifies that feed should be output using Q values
   showNotes: false, // specifies that operation notes should be output
-  useSmoothing: true, // specifies if smoothing should be used or not
+  useSmoothing: false, // specifies if smoothing should be used or not
   usePitchForTapping: false, // enable to use pitch instead of feed for the F-word for canned tapping cycles - note that your CNC control must be setup for pitch mode!
   useG95: false, // use IPR/MPR instead of IPM/MPM
   useG28: false, // specifies that G28 should be used instead of G53
@@ -62,7 +62,7 @@ properties = {
   useSubroutinePatterns: false, // generates subroutines for patterned operation
   useSubroutineCycles: false, // generates subroutines for cycle operations on same holes
   useRigidTapping: "no", // output rigid tapping block
-  fanTable: true, // fan table off
+  fanTable: false, // fan table off
 };
 
 // user-defined property definitions
