@@ -535,7 +535,7 @@ function setSmoothing(mode) {
   validate(!lengthCompensationActive, "Length compensation is active while trying to update smoothing.");
 
   currentSmoothing = mode;
-  writeBlock(gFormat.format(5.1), mode ? "Q1" : "Q0");
+  writeBlock(gFormat.format(5.1), mode ? "Q1 R4" : "Q0");
   return true;
 }
 
@@ -1341,7 +1341,13 @@ function onSection() {
   var abc = defineWorkPlane(currentSection, true);
 
   if (properties.useSmoothing) {
-    if (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "drill")) {
+    if ((hasParameter("operation-strategy") && (getParameter("operation-strategy") != "drill")) && 
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "face")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "contour2d")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "pocket2d")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "slot")) &&
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "circular")) &&      
+      (hasParameter("operation-strategy") && (getParameter("operation-strategy") != "bore")))  {
       if (setSmoothing(true)) {
         // we force G43 using lengthCompensationActive
       }
