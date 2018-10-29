@@ -30,7 +30,7 @@ minimumChordLength = spatial(0.25, MM);
 minimumCircularRadius = spatial(0.01, MM);
 maximumCircularRadius = spatial(1000, MM);
 minimumCircularSweep = toRad(0.01);
-maximumCircularSweep = toRad(360);
+maximumCircularSweep = toRad(359);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
 allowSpiralMoves = false;
@@ -1170,7 +1170,7 @@ function onSection() {
   if (insertToolCall) {
     forceWorkPlane();
 
-    if (tool.number > 99) {
+    if (tool.number > 199) {
       warning(localize("Tool number exceeds maximum value."));
     }
 
@@ -1327,7 +1327,7 @@ function onSection() {
 
   if (insertToolCall || !lengthCompensationActive || retracted || manualNCStop || (!isFirstSection() && getPreviousSection().isMultiAxis())) {
     var lengthOffset = tool.lengthOffset;
-    if (lengthOffset > 99) {
+    if (lengthOffset > 199) {
       error(localize("Length offset out of range."));
       return;
     }
@@ -2111,7 +2111,7 @@ function onLinear(_x, _y, _z, feed) {
     if (pendingRadiusCompensation >= 0) {
       pendingRadiusCompensation = -1;
       var d = tool.diameterOffset;
-      if (d > 99) {
+      if (d > 199) {
         warning(localize("The diameter offset exceeds the maximum value."));
       }
       writeBlock(gPlaneModal.format(17));
