@@ -32,7 +32,7 @@ minimumRevision = 40783;
 
 longDescription = "Samsung lathe (Fanuc) with support for mill-turn.";
 
-extension = "nc";
+extension = "";
 programNameIsInteger = true;
 setCodePage("ascii");
 
@@ -1931,11 +1931,13 @@ function goHome(forceY) {
       var yAxis = "V" + yFormat.format(properties.g53HomePositionY);
     }
     gMotionModal.reset();
-    writeBlock(
+    /*writeBlock(
       gMotionModal.format(0), gFormat.format(53),
       "Z" + zFormat.format((getSpindle(true) == SPINDLE_MAIN) ? properties.g53HomePositionZ : properties.g53HomePositionSubZ)
      );
-    writeBlock(gMotionModal.format(0), gFormat.format(53), "X" + xFormat.format(properties.g53HomePositionX), yAxis);
+    writeBlock(gMotionModal.format(0), gFormat.format(53), "X" + xFormat.format(properties.g53HomePositionX), yAxis);*/
+    writeBlock(gMotionModal.format(0), gFormat.format(30), "U" + xFormat.format(0)); 
+    writeBlock(gMotionModal.format(0), gFormat.format(30), "W" + xFormat.format(0)); 
   }
 }
 
