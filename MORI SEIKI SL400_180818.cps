@@ -11,13 +11,15 @@
 */
 
 //merged with version 40783 8/18/18 NN
+//merged with version 42171 11/5/18 NN
+
 
 description = "M637";
 vendor = "Haas Automation";
 vendorUrl = "https://www.haascnc.com";
 legal = "Copyright (C) 2012-2018 by Autodesk, Inc.";
 certificationLevel = 2;
-minimumRevision = 40783;
+minimumRevision = 42171;
 
 longDescription = "Generic HAAS turning post. Turn on the property 'manualToolChange' if your CNC does not have an automatic tool changer. Use Turret 0 for Positional Turret, Turret 101 for QCTP on X- Post, Turret 102 for QCTP on X+ Post, Turret 103 for Gang Tooling on X- Post, Turret 104 for Gang Tooling on X+ Tool Post.";
 
@@ -1162,7 +1164,7 @@ function onCyclePoint(x, y, z) {
 
   if (isSameDirection(currentSection.workPlane.forward, new Vector(0, 0, 1)) ||
       isSameDirection(currentSection.workPlane.forward, new Vector(0, 0, -1))) {
-    writeBlock(gPlaneModal.format(17)); // XY plane
+    gPlaneModal.format(17); // 2-axis lathes typically don't use G17
   } else {
     expandCyclePoint(x, y, z);
     return;
@@ -1226,24 +1228,7 @@ function onCyclePoint(x, y, z) {
   }
   
   if (isFirstCyclePoint()) {
-    switch (gPlaneModal.getCurrent()) {
-    case 17:
-      writeBlock(gMotionModal.format(0), zOutput.format(cycle.clearance));
-      break;
-    case 18:
-      writeBlock(gMotionModal.format(0), yOutput.format(cycle.clearance));
-      break;
-    case 19:
-      writeBlock(gMotionModal.format(0), xOutput.format(cycle.clearance));
-      break;
-    default:
-      error(localize("Unsupported drilling orientation."));
-      return;
-    }
-
     repositionToCycleClearance(cycle, x, y, z);
-    
-    // return to initial Z which is clearance plane and set absolute mode
 
     var F = (gFeedModeModal.getCurrent() == 99 ? cycle.feedrate/tool.spindleRPM : cycle.feedrate); // FPR NN
     var P = !cycle.dwell ? 0 : clamp(1, cycle.dwell * 1000, 99999999); // in milliseconds
@@ -1457,7 +1442,7 @@ function onSpindleSpeed(spindleSpeed) {
   }
   if ((pOutput.getCurrent() != Number.POSITIVE_INFINITY) && rpmFormat.areDifferent(spindleSpeed, pOutput.getCurrent())) { // avoid redundant output of spindle speed
     startSpindle(false, false, getFramePosition(currentSection.getInitialPosition()), spindleSpeed);
-}
+  }
 }
 
 function startSpindle(tappingMode, forceRPMMode, initialPosition, rpm) {
@@ -1505,13 +1490,12 @@ function startSpindle(tappingMode, forceRPMMode, initialPosition, rpm) {
       spindleDir
     );
   } else {
-      writeBlock(
-        spindleMode,
-        sOutput.format(_spindleSpeed),
-        spindleDir
-      );
-    }
-  
+    writeBlock(
+      spindleMode,
+      sOutput.format(_spindleSpeed),
+      spindleDir
+    );
+  }
   // wait for spindle here if required
 }
 
