@@ -17,7 +17,7 @@
 
   <coolant options="FLOOD"/>
 
-  <multiAxis adjust="yes" angle="10deg" cone="3deg" linearizationTolerance="0.038100000000000002mm" method="off" tolerance="0.038100000000000002mm"/>
+  <multiAxis adjust="yes" angle="10deg" cone="3deg" linearizationTolerance="0.040000000000000001mm" method="off" tolerance="0.038099998654665047mm"/>
 
   <tooling maximumToolDiameter="0mm" maximumToolLength="0mm" maximumToolWeight="0kg" numberOfTools="12" toolChanger="yes" toolPreload="no"/>
 
@@ -32,15 +32,61 @@
   </simulation>
 
   <post>
-    <postProcessor>W:/Inventor-HSMWorks/MACHINE POSTS/YOU JI YV-320EL+C_Fanuc Oi-TD_180807.cps</postProcessor>
-    <setupSheet>system://setup-sheet-excel-2007.cps</setupSheet>
+    <postProcessor>W:/Inventor-HSMWorks/MACHINE POSTS/You Ji_180817.cps</postProcessor>
+    <postProperties>
+      <Parameters>
+        <Parameter expression="false" name="autoEject" value="false"/>
+        <Parameter expression="false" name="cBrakeDrilling" value="false"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="g53HomePositionSubZ" value="0"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="g53HomePositionX" value="0"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="g53HomePositionY" value="0"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="g53HomePositionZ" value="0"/>
+        <Parameter expression="false" name="gotChipConveyor" value="false"/>
+        <Parameter expression="false" name="gotPartCatcher" value="false"/>
+        <Parameter expression="false" name="looping" value="false"/>
+        <Parameter expression="12" name="maxTool" value="12"/>
+        <Parameter expression="2500" name="maximumSpindleSpeed" value="2500"/>
+        <Parameter expression="1" name="numberOfRepeats" value="1"/>
+        <Parameter expression="false" name="optimizeCaxisSelect" value="false"/>
+        <Parameter expression="true" name="optionalStop" value="true"/>
+        <Parameter expression="'same'" name="outputUnits" value="same"/>
+        <Parameter expression="true" name="separateWordsWithSpace" value="true"/>
+        <Parameter expression="1" name="sequenceNumberIncrement" value="1"/>
+        <Parameter expression="10" name="sequenceNumberStart" value="10"/>
+        <Parameter expression="true" name="sequenceNumberToolOnly" value="true"/>
+        <Parameter expression="true" name="showNotes" value="true"/>
+        <Parameter expression="true" name="showSequenceNumbers" value="true"/>
+        <Parameter expression="'Phase'" name="transferType" value="Phase"/>
+        <Parameter expression="false" name="transferUseTorque" value="false"/>
+        <Parameter expression="true" name="useCycles" value="true"/>
+        <Parameter expression="false" name="useG28" value="false"/>
+        <Parameter expression="true" name="useG99" value="true"/>
+        <Parameter expression="false" name="useParametricFeed" value="false"/>
+        <Parameter expression="false" name="useRadius" value="false"/>
+        <Parameter expression="true" name="useSimpleThread" value="true"/>
+        <Parameter expression="false" name="useTailStock" value="false"/>
+        <Parameter expression="true" name="writeMachine" value="true"/>
+        <Parameter expression="true" name="writeTools" value="true"/>
+        <Parameter expression="false" name="writeVersion" value="false"/>
+      </Parameters>
+    </postProperties>
+    <setupSheet>W:/Inventor-HSMWorks/MACHINE POSTS/!Sauer_SSExcel_SetupSheet.cps</setupSheet>
+    <setupSheetProperties>
+      <Parameters>
+        <Parameter expression="false" name="listVariables" value="false"/>
+        <Parameter expression="5000" hexValue="0x40b3880000000000" name="rapidFeed" value="5000"/>
+        <Parameter expression="15" hexValue="0x402e000000000000" name="toolChangeTime" value="15"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="xLocationDim" value="0"/>
+        <Parameter expression="'CENTER OF STOCK'" name="xyLocation" value="CENTER OF STOCK"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="yLocationDim" value="0"/>
+        <Parameter expression="'TOP OF STOCK'" name="zLocation" value="TOP OF STOCK"/>
+      </Parameters>
+    </setupSheetProperties>
   </post>
 
   <axis actuator="linear" id="Y" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
 
   <axis actuator="linear" id="X" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
-
-  <axis actuator="rotational" axis="1 0 0" coordinate="X" id="U" link="table" maximumFeed="21600deg/min" name="" offset="0mm 0mm 0mm" preference="dont care" range="0deg 360deg" resolution="0deg"/>
 
   <axis actuator="rotational" axis="0 0 1" coordinate="Z" id="V" link="table" maximumFeed="21600deg/min" name="" offset="0mm 0mm 0mm" preference="dont care" range="0deg 360deg" resolution="0deg"/>
 

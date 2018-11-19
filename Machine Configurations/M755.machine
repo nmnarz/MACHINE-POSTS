@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<machine xmlns="http://www.hsmworks.com/xml/2009/machine">
+
+  <vendor>GANESH</vendor>
+
+  <model></model>
+
+  <description>M755</description>
+
+  <control>FANUC</control>
+
+  <machining additive="no" jet="no" milling="yes" turning="no"/>
+
+  <dimensions depth="0mm" height="0mm" weight="0kg" width="0mm"/>
+
+  <capacities depth="0mm" height="0mm" weight="0kg" width="0mm"/>
+
+  <coolant options="FLOOD THROUGH_TOOL FLOOD_THROUGH_TOOL"/>
+
+  <multiAxis adjust="yes" angle="10deg" cone="3deg" linearizationTolerance="0.038100000000000002mm" method="off" tolerance="0.038100000000000002mm"/>
+
+  <tooling maximumToolDiameter="0mm" maximumToolLength="0mm" maximumToolWeight="0kg" numberOfTools="30" toolChanger="yes" toolPreload="yes"/>
+
+  <machiningTime ratio="1" toolChangeTime="5s"/>
+
+  <home x="0mm" y="0mm" z="0mm"/>
+
+  <capabilities maximumBlockProcessingSpeed="0" maximumFeedrate="0mm/min" workOffsets="100"/>
+
+  <simulation retractOnIndexing="yes" shortestAngularRotation="yes" wcs="0mm 0mm 0mm">
+    <machineAssembly></machineAssembly>
+  </simulation>
+
+  <post>
+    <postProcessor>W:/Inventor-HSMWorks/MACHINE POSTS/GANESH 755_180817.cps</postProcessor>
+    <postProperties>
+      <Parameters>
+        <Parameter expression="false" name="allow3DArcs" value="false"/>
+        <Parameter expression="false" name="forceIJK" value="false"/>
+        <Parameter expression="false" name="o8" value="false"/>
+        <Parameter expression="true" name="optionalStop" value="true"/>
+        <Parameter expression="true" name="preloadTool" value="true"/>
+        <Parameter expression="true" name="separateWordsWithSpace" value="true"/>
+        <Parameter expression="10" name="sequenceNumberIncrement" value="10"/>
+        <Parameter expression="10" name="sequenceNumberStart" value="10"/>
+        <Parameter expression="false" name="showNotes" value="false"/>
+        <Parameter expression="false" name="showSequenceNumbers" value="false"/>
+        <Parameter expression="false" name="useG28" value="false"/>
+        <Parameter expression="false" name="useG54x4" value="false"/>
+        <Parameter expression="false" name="useG95" value="false"/>
+        <Parameter expression="false" name="useParametricFeed" value="false"/>
+        <Parameter expression="false" name="usePitchForTapping" value="false"/>
+        <Parameter expression="false" name="useRadius" value="false"/>
+        <Parameter expression="'without'" name="useRigidTapping" value="without"/>
+        <Parameter expression="false" name="useSmoothing" value="false"/>
+        <Parameter expression="false" name="useSubroutineCycles" value="false"/>
+        <Parameter expression="false" name="useSubroutinePatterns" value="false"/>
+        <Parameter expression="false" name="useSubroutines" value="false"/>
+        <Parameter expression="true" name="writeMachine" value="true"/>
+        <Parameter expression="true" name="writeTools" value="true"/>
+      </Parameters>
+    </postProperties>
+    <setupSheet>W:/Inventor-HSMWorks/MACHINE POSTS/!Sauer_SSExcel_SetupSheet.cps</setupSheet>
+    <setupSheetProperties>
+      <Parameters>
+        <Parameter expression="false" name="listVariables" value="false"/>
+        <Parameter expression="5000" hexValue="0x40b3880000000000" name="rapidFeed" value="5000"/>
+        <Parameter expression="15" hexValue="0x402e000000000000" name="toolChangeTime" value="15"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="xLocationDim" value="0"/>
+        <Parameter expression="'CENTER OF STOCK'" name="xyLocation" value="CENTER OF STOCK"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="yLocationDim" value="0"/>
+        <Parameter expression="'TOP OF STOCK'" name="zLocation" value="TOP OF STOCK"/>
+      </Parameters>
+    </setupSheetProperties>
+  </post>
+
+  <axis actuator="linear" id="Y" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <axis actuator="linear" id="X" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <axis actuator="linear" id="Z" link="head" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <spindle axis="0 0 1" maximumPower="0kW" maximumSpeed="10000rpm" minimumSpeed="1rpm">
+    <description></description>
+  </spindle>
+
+</machine>

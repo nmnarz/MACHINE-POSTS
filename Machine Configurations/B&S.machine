@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<machine xmlns="http://www.hsmworks.com/xml/2009/machine">
+
+  <vendor></vendor>
+
+  <model></model>
+
+  <description>Brown &amp; Sharpe</description>
+
+  <control></control>
+
+  <machining additive="no" jet="no" milling="yes" turning="no"/>
+
+  <dimensions depth="0mm" height="0mm" weight="0kg" width="0mm"/>
+
+  <capacities depth="0mm" height="0mm" weight="0kg" width="0mm"/>
+
+  <coolant options="FLOOD"/>
+
+  <multiAxis adjust="yes" angle="10deg" cone="3deg" linearizationTolerance="0.040000000000000001mm" method="off" tolerance="0.038099998654665047mm"/>
+
+  <tooling maximumToolDiameter="0mm" maximumToolLength="0mm" maximumToolWeight="0kg" numberOfTools="100" toolChanger="yes" toolPreload="yes"/>
+
+  <machiningTime ratio="1" toolChangeTime="15s"/>
+
+  <home x="0mm" y="0mm" z="0mm"/>
+
+  <capabilities maximumBlockProcessingSpeed="0" maximumFeedrate="0mm/min" workOffsets="100"/>
+
+  <simulation retractOnIndexing="yes" shortestAngularRotation="yes" wcs="0mm 0mm 0mm">
+    <machineAssembly></machineAssembly>
+  </simulation>
+
+  <post>
+    <postProcessor>W:/Inventor-HSMWorks/MACHINE POSTS/BROWN &amp; SHARP.cps</postProcessor>
+    <postProperties>
+      <Parameters/>
+    </postProperties>
+    <setupSheet>W:/Inventor-HSMWorks/MACHINE POSTS/!Sauer_SSExcel_SetupSheet.cps</setupSheet>
+    <setupSheetProperties>
+      <Parameters>
+        <Parameter expression="false" name="listVariables" value="false"/>
+        <Parameter expression="5000" hexValue="0x40b3880000000000" name="rapidFeed" value="5000"/>
+        <Parameter expression="15" hexValue="0x402e000000000000" name="toolChangeTime" value="15"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="xLocationDim" value="0"/>
+        <Parameter expression="'CENTER OF STOCK'" name="xyLocation" value="CENTER OF STOCK"/>
+        <Parameter expression="0" hexValue="0x0000000000000000" name="yLocationDim" value="0"/>
+        <Parameter expression="'TOP OF STOCK'" name="zLocation" value="TOP OF STOCK"/>
+      </Parameters>
+    </setupSheetProperties>
+  </post>
+
+  <axis actuator="linear" id="Y" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <axis actuator="linear" id="X" link="table" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <axis actuator="linear" id="Z" link="head" maximumFeed="0mm/min" range="0mm 0mm" resolution="0mm"/>
+
+  <spindle axis="0 0 1" maximumPower="0kW" maximumSpeed="10000rpm" minimumSpeed="1rpm">
+    <description></description>
+  </spindle>
+
+</machine>
