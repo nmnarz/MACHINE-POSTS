@@ -58,8 +58,8 @@ properties = {
   useG28: false, // specifies that G28 should be used instead of G53
   useG54x4: false, // Fanuc 30i supports G54.4 for Workpiece Error Compensation
   useSubroutines: false, // specifies that subroutines per each operation should be generated
-  useSubroutinePatterns: true, // generates subroutines for patterned operation
-  useSubroutineCycles: true, // generates subroutines for cycle operations on same holes
+  useSubroutinePatterns: false, // generates subroutines for patterned operation
+  useSubroutineCycles: false, // generates subroutines for cycle operations on same holes
   useRigidTapping: "without" // output rigid tapping block
 };
 
