@@ -1125,26 +1125,42 @@ function onSection() {
   var forceSmoothing =  properties.useSmoothing &&
     (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") ||
     !isFirstSection() && getPreviousSection().hasParameter("operation-strategy") && (getPreviousSection().getParameter("operation-strategy") == "drill")); // force smoothing in case !insertToolCall (2d chamfer)
-  if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
-    
-    // stop spindle before retract during tool change
-    if (insertToolCall && !isFirstSection() && !manualNCStop) {
-      onCommand(COMMAND_STOP_SPINDLE); 
-      onCommand(COMMAND_COOLANT_OFF);           
-    }
-    
-    // retract to safe plane
-    if(!manualNCStop){
-    writeRetract(Z); // retract
-    writeRetract(X, Y);
-    }
-    forceXYZ();
-    if ((insertToolCall && !isFirstSection()) || forceSmoothing) {
-      disableLengthCompensation();  
-      setSmoothing(false);
-
-    }
-  }
+    if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
+      if (!isFirstSection() && tool.number == getPreviousSection().getTool().number && !newWorkOffset && !newWorkPlane && !forceSmoothing){
+  
+        // stop spindle before retract during tool change
+        if (insertToolCall && !isFirstSection() && !manualNCStop) {
+          writeOptionalBlock("M05");
+          writeOptionalBlock("M09");         
+        }
+  
+        // retract to safe plane
+        if(!manualNCStop){
+        writeRetract2(Z); // retract
+        }
+        forceXYZ();
+        if ((insertToolCall && !isFirstSection()) || forceSmoothing) {
+          disableLengthCompensation();  
+          setSmoothing(false);
+  
+        }
+      } else {
+        if (insertToolCall && !isFirstSection() && !manualNCStop) {
+          onCommand(COMMAND_STOP_SPINDLE); 
+          onCommand(COMMAND_COOLANT_OFF);           
+        }
+      
+        // retract to safe plane
+        if(!manualNCStop){
+        writeRetract(Z); // retract
+        }
+        forceXYZ();
+        if ((insertToolCall && !isFirstSection()) || forceSmoothing) {
+          disableLengthCompensation();  
+          setSmoothing(false);      
+        }
+      }
+    }  
 
   if (hasParameter("operation-comment")) {
     var comment = getParameter("operation-comment");
@@ -2625,6 +2641,93 @@ function writeRetract() {
     if (_xyzMoved[2]) {
   zOutput.reset();
 }
+  }
+}
+
+/** Output block to do safe retract and/or move to home position. */
+function writeRetract2() {
+  // initialize routine
+  var _xyzMoved = new Array(false, false, false);
+  var _useG28 = properties.useG28; // can be either true or false
+
+  // check syntax of call
+  if (arguments.length == 0) {
+    error(localize("No axis specified for writeRetract()."));
+    return;
+  }
+  for (var i = 0; i < arguments.length; ++i) {
+    if ((arguments[i] < 0) || (arguments[i] > 2)) {
+      error(localize("Bad axis specified for writeRetract()."));
+      return;
+      }
+    if (_xyzMoved[arguments[i]]) {
+      error(localize("Cannot retract the same axis twice in one line"));
+      return;
+    }
+    _xyzMoved[arguments[i]] = true;
+  }
+  
+  // special conditions
+
+  // define home positions
+  var _xHome;
+  var _yHome;
+  var _zHome;
+  if (_useG28) {
+    _xHome = 0;
+    _yHome = 0;
+    _zHome = 0;
+  } else {
+    _xHome = machineConfiguration.hasHomePositionX() ? machineConfiguration.getHomePositionX() : 0;
+    _yHome = machineConfiguration.hasHomePositionY() ? machineConfiguration.getHomePositionY() : 0;
+    _zHome = machineConfiguration.getRetractPlane();
+  }
+
+  // format home positions
+  var words = []; // store all retracted axes in an array
+  for (var i = 0; i < arguments.length; ++i) {
+    // define the axes to move
+    switch (arguments[i]) {
+    case X:
+      if (!machineConfiguration.hasHomePositionX()) {
+        _useG28 = false;
+      }
+      words.push("X" + xyzFormat.format(_xHome));
+      break;
+    case Y:
+      if (!machineConfiguration.hasHomePositionY()) {
+        _useG28 = false;
+      }
+      words.push("Y" + xyzFormat.format(_yHome));
+      break;
+    case Z:
+      words.push("Z" + xyzFormat.format(_zHome));
+      retracted = true;
+      break;
+    }
+  }
+
+  // output move to home
+  if (words.length > 0) {
+    if (_useG28) {
+      gAbsIncModal.reset();
+      writeOptionalBlock(gFormat.format(28), gAbsIncModal.format(91), words);
+      writeOptionalBlock(gAbsIncModal.format(90));
+    } else {
+      gMotionModal.reset();
+      writeOptionalBlock(gAbsIncModal.format(90), gFormat.format(53), gMotionModal.format(0), words);
+    }
+
+    // force any axes that move to home on next block
+    if (_xyzMoved[0]) {
+      xOutput.reset();
+    }
+    if (_xyzMoved[1]) {
+      yOutput.reset();
+    }
+    if (_xyzMoved[2]) {
+      zOutput.reset();
+    }
   }
 }
 
