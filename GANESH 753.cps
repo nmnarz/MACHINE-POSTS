@@ -2752,7 +2752,7 @@ function writeRetract2() {
         zOutput.reset();
       }
     }
-  }
+}
 
 function onClose() {
   writeln("");
