@@ -35,6 +35,7 @@ minimumCircularSweep = toRad(0.01);
 maximumCircularSweep = toRad(180);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
+allowSpiralMoves = true;
 
 
 
@@ -1272,7 +1273,7 @@ function onSection() {
        (tool.clockwise != getPreviousSection().getTool().clockwise))) {
     forceSpindleSpeed = false;
     
-    if (spindleSpeed < 1) {
+    if (spindleSpeed < 0) {
       error(localize("Spindle speed out of range."));
       return;
     }

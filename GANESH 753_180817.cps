@@ -1128,13 +1128,13 @@ function onSection() {
     (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") ||
     !isFirstSection() && getPreviousSection().hasParameter("operation-strategy") && (getPreviousSection().getParameter("operation-strategy") == "drill")); // force smoothing in case !insertToolCall (2d chamfer)
   if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
-    
+
     // stop spindle before retract during tool change
     if (insertToolCall && !isFirstSection() && !manualNCStop) {
       onCommand(COMMAND_STOP_SPINDLE); 
       onCommand(COMMAND_COOLANT_OFF);           
     }
-    
+
     // retract to safe plane
     if(!manualNCStop){
     writeRetract(Z); // retract
@@ -1145,7 +1145,7 @@ function onSection() {
       setSmoothing(false);
 
     }
-  }
+  } 
 
   if (hasParameter("operation-comment")) {
     var comment = getParameter("operation-comment");
@@ -1259,7 +1259,7 @@ function onSection() {
        (tool.clockwise != getPreviousSection().getTool().clockwise))) {
     forceSpindleSpeed = false;
     
-    if (spindleSpeed < 1) {
+    if (spindleSpeed < 0) {
       error(localize("Spindle speed out of range."));
       return;
     }
@@ -2489,6 +2489,8 @@ function onCommand(command) {
     writeRetract(Z); // retract
     zOutput.reset();
     writeln("");
+    gMotionModal.reset();
+    writeBlock(gAbsIncModal.format(90), gFormat.format(53), gMotionModal.format(0), xOutput.format(45), yOutput.format(0));
     writeBlock(mFormat.format(0));
     forceSpindleSpeed = true;
     manualNCStop = true;
