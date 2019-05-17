@@ -35,7 +35,7 @@ minimumCircularSweep = toRad(0.01);
 maximumCircularSweep = toRad(180);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
-allowSpiralMoves = true;
+//allowSpiralMoves = true;
 
 
 

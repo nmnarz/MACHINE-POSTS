@@ -455,6 +455,8 @@ function onOpen() {
     break;
   }
   
+  writeBlock(gFormat.format(53), gMotionModal.format(0), "X" + xyzFormat.format(10), "Y" + xyzFormat.format(-7.5));
+
   if (properties.useG95 && properties.useParametricFeed) {
     error(localize("Parametric feed is not supported when using G95."));
     return;
@@ -1130,13 +1132,15 @@ function onSection() {
   
         // stop spindle before retract during tool change
         if (insertToolCall && !isFirstSection() && !manualNCStop) {
-          writeOptionalBlock("M05");
-          writeOptionalBlock("M09");         
+          //writeOptionalBlock("M05");
+          //writeOptionalBlock("M09");   
+          onCommand(COMMAND_STOP_SPINDLE); 
+          onCommand(COMMAND_COOLANT_OFF);         
         }
   
         // retract to safe plane
         if(!manualNCStop){
-        writeRetract2(Z); // retract
+        writeRetract(Z); // retract
         }
         forceXYZ();
         if ((insertToolCall && !isFirstSection()) || forceSmoothing) {

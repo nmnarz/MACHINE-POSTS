@@ -1182,9 +1182,9 @@ function onSection() {
 
     var Comp = hasParameter("operation:compensationType") ? getParameter("operation:compensationType") : " ";
     if (Comp == "control"){
-      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment+ " " +dFormat.format(tool.diameterOffset) + ")");
+      writeBlock("/T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment+ " " +dFormat.format(tool.diameterOffset) + ")");
     } else {
-      writeBlock("T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment + ")");
+      writeBlock("/T" + toolFormat.format(tool.number), mFormat.format(6), "("+tool.comment + ")");
     }
 
     var showToolZMin = false;

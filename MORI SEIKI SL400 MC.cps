@@ -594,7 +594,7 @@ function onOpen() {
   }
 
   sequenceNumber = properties.sequenceNumberStart;
-  writeln("%");
+  //writeln("%");
 
   if (programName) {
     var programId;
@@ -635,13 +635,13 @@ function onOpen() {
 
   if (properties.writeMachine && (vendor || model || description)) {
     if (description) {
-        writeComment(localize("description") + ": "  + description);
+        //writeComment(localize("description") + ": "  + description);
       }
     if (vendor) {
-      writeComment(localize("vendor") + ": " + vendor);
+      //writeComment(localize("vendor") + ": " + vendor);
     }
     if (model) {
-      writeComment(localize("model") + ": " + model);
+      //writeComment(localize("model") + ": " + model);
     }
   }
 
@@ -677,7 +677,7 @@ function onOpen() {
           comment += " - " + localize("ZMIN") + "=" + spatialFormat.format(zRanges[tool.number].getMinimum());
         }
         comment += " - " + getToolTypeName(tool.type);
-        writeComment(comment);
+        //writeComment(comment);
       }
     }
   }
@@ -728,7 +728,7 @@ function onOpen() {
     writeln("");
     writeln("N1 (START MAIN PROGRAM)");
   }
-
+/*
   writeBlock(gPlaneModal.format(18), gMotionModal.format(0), gFormat.format(40), gFormat.format(80));
 
   if (properties.outputUnits == "same") {
@@ -741,8 +741,8 @@ function onOpen() {
       break;
     }
   }
-  
-  goHome(true);
+  */
+  //goHome(true);
   if (gotSecondarySpindle) {
     retractSubSpindle();
   }
@@ -1272,13 +1272,13 @@ function onSection() {
     previousSpindle = tempSpindle;
   }
   newSpindle = tempSpindle != previousSpindle;
-  
+
   // End the previous section if a new tool is selected
   if (!isFirstSection() && insertToolCall &&
       !(stockTransferIsActive && partCutoff)) {
     if (stockTransferIsActive) {
       // writeBlock(mFormat.format(getCode("SPINDLE_SYNCHRONIZATION_OFF", getSpindle(true))));
-      goHome(true);
+      //goHome(true);
     } else {
       onCommand(COMMAND_COOLANT_OFF);  
       if (previousSpindle == SPINDLE_LIVE) {
@@ -1291,7 +1291,11 @@ function onSection() {
           writeBlock(cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true))));
         }
       } else {
-        goHome(true);
+        //goHome(true); nmn getPreviousSection().getParameter("operation:tool_vendor")
+        var g50x = Number(getPreviousSection().hasParameter("operation:tool_vendor") ? getPreviousSection().getParameter("operation:tool_vendor") : 0);
+        var g50z = Number(getPreviousSection().hasParameter("operation:tool_comment") ? getPreviousSection().getParameter("operation:tool_comment") : 0);
+        writeBlock(gFormat.format(50), xOutput.format(g50x/2), zOutput.format(g50z));
+        writeBlock(gMotionModal.format(0), "T" + toolFormat.format(getPreviousSection().getTool().number * 100));
       }
     }
 
@@ -1427,15 +1431,20 @@ function onSection() {
       writeBlock(feedMode);
     }
   }
-
-  // Write out maximum spindle speed
+  
+  forceXYZ();
+  var g50x = Number(hasParameter("operation:tool_vendor") ? getParameter("operation:tool_vendor") : 0);
+  var g50z = Number(hasParameter("operation:tool_comment") ? getParameter("operation:tool_comment") : 0);
+  // Write out maximum spindle speed and tool home positions
   if (insertToolCall && !stockTransferIsActive) {
     if ((tool.maximumSpindleSpeed > 0) && (currentSection.getTool().getSpindleMode() == SPINDLE_CONSTANT_SURFACE_SPEED)) {
       var maximumSpindleSpeed = (tool.maximumSpindleSpeed > 0) ? Math.min(tool.maximumSpindleSpeed, properties.maximumSpindleSpeed) : properties.maximumSpindleSpeed;
-      writeBlock(gFormat.format(50), sOutput.format(maximumSpindleSpeed));
-      writeBlock(hasParameter("operation:tool_vendor") ? getParameter("operation:tool_vendor") : 0);
+      writeBlock(gFormat.format(50), xOutput.format(g50x/2), zOutput.format(g50z), sOutput.format(maximumSpindleSpeed));
       //writeBlock(gFormat.format(50), xOutput.format(10), zOutput.format(20), sOutput.format(maximumSpindleSpeed));
       sOutput.reset();
+    }
+    else {
+      writeBlock(hasParameter("operation:tool_vendor") ? getParameter("operation:tool_vendor") : 0);
     }
   }
 
@@ -1529,9 +1538,9 @@ function onSection() {
     }
 
     gMotionModal.reset();
-    writeBlock("T" + toolFormat.format(tool.number * 100 + compensationOffset));
+    writeBlock(gMotionModal.format(0), "T" + toolFormat.format(tool.number * 100 + compensationOffset));
     if (tool.comment) {
-      writeComment(tool.comment);
+      //writeComment(tool.comment); nmn
     }
 
     // Turn on coolant
@@ -1592,7 +1601,7 @@ function onSection() {
     // Turn spindle on
     gSpindleModeModal.reset();
     if (!tapping) {
-      startSpindle(false, true, getFramePosition(currentSection.getInitialPosition()));
+      //startSpindle(false, true, getFramePosition(currentSection.getInitialPosition()));
     } else { // turn spindle off for tapping
       writeBlock(
         gSpindleModeModal.format(getCode("CONSTANT_SURFACE_SPEED_OFF", getSpindle(false))),
@@ -1930,8 +1939,8 @@ function goHome(forceY) {
         "Z" + zFormat.format((getSpindle(true) == SPINDLE_MAIN) ? properties.g53HomePositionZ : properties.g53HomePositionSubZ)
        );
     writeBlock(gMotionModal.format(0), gFormat.format(53), "X" + xFormat.format(properties.g53HomePositionX), yAxis);*/
-    writeBlock(gMotionModal.format(0), gFormat.format(30), "W" + zFormat.format(0));     
-    writeBlock(gMotionModal.format(0), gFormat.format(30), "U" + xFormat.format(0)); 
+    writeBlock(gMotionModal.format(0), gFormat.format(28), "W" + zFormat.format(0));     
+    writeBlock(gMotionModal.format(0), gFormat.format(28), "U" + xFormat.format(0)); 
   }
 }
 
@@ -2524,7 +2533,7 @@ function getMoveLength(_x, _y, _z, _a, _b, _c) {
 // End of multi-axis feedrate logic
 
 function onCircular(clockwise, cx, cy, cz, x, y, z, feed) {
-  var directionCode = getSpindle(true) == SPINDLE_SUB ? (clockwise ? 3 : 2) : (clockwise ? 2 : 3);
+  var directionCode = getSpindle(true) == SPINDLE_SUB ? (clockwise ? 3 : 2) : (clockwise ? 3 : 2);  //swapped 3 to be clockwise
   if (machineState.useXZCMode) {
     switch (getCircularPlane()) {
     case PLANE_ZX:
@@ -3457,14 +3466,13 @@ function engagePartCatcher(engage) {
 }
 
 function onSectionEnd() {
-
   if (machineState.usePolarMode) {
     setPolarMode(false); // disable polar interpolation mode
   }
 
   // cancel SFM mode to preserve spindle speed
   if ((currentSection.getTool().getSpindleMode() == SPINDLE_CONSTANT_SURFACE_SPEED) && !stockTransferIsActive) {
-    startSpindle(false, true, getFramePosition(currentSection.getFinalPosition()));
+    //startSpindle(false, true, getFramePosition(currentSection.getFinalPosition()));
   }
 
   if (properties.gotPartCatcher && partCutoff && currentSection.partCatcher) {
@@ -3570,5 +3578,5 @@ function onClose() {
     onCommand(COMMAND_OPEN_DOOR);
     writeBlock(mFormat.format(30)); // stop program, spindle stop, coolant off
   }
-  writeln("%");
+  //writeln("%");
 }

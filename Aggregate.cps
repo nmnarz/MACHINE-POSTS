@@ -67,14 +67,14 @@ var gFormat = createFormat({prefix:"G", decimals:0});
 var mFormat = createFormat({prefix:"M", decimals:0});
 var hFormat = createFormat({prefix:"H", width:2, zeropad:true, decimals:1});
 
-var xyzFormat = createFormat({decimals:(unit == MM ? 3 : 4)});
+var xyzFormat = createFormat({decimals:(unit == MM ? 3 : 4), forceDecimal:true});
 var feedFormat = createFormat({decimals:(unit == MM ? 1 : 2), forceDecimal:true});
 var toolFormat = createFormat({decimals:0});
 var rpmFormat = createFormat({decimals:0});
 var secFormat = createFormat({decimals:3, forceDecimal:true}); // seconds - range 0.001-1000
 var taperFormat = createFormat({decimals:1, scale:DEG});
 
-var xOutput = createVariable({prefix:"X"}, xyzFormat);
+var xOutput = createVariable({prefix:"X["}, xyzFormat);
 var yOutput = createVariable({prefix:"Y"}, xyzFormat);
 var zOutput = createVariable({prefix:"Z"}, xyzFormat);
 var feedOutput = createVariable({prefix:"F"}, feedFormat);
@@ -131,6 +131,7 @@ function onOpen() {
   if (programName) {
     writeComment(programName);
   }
+
   if (programComment) {
     writeComment(programComment);
   }
@@ -185,10 +186,11 @@ function onOpen() {
         }
         comment += " - " + getToolTypeName(tool.type);
         writeComment(comment);
+        writeBlock("#5" + tool.number + "=6");
       }
     }
   }
-
+  
   // Check if there are more than one work offset and bail if so
   if ((getNumberOfSections() > 0) && (getSection(0).workOffset == 0)) {
     for (var i = 0; i < getNumberOfSections(); ++i) {
@@ -307,6 +309,8 @@ function onSection() {
     if (tool.comment) {
       writeComment(tool.comment);
     }
+      //macro for tool length in X
+    //writeBlock("#5" + tool.number + "=");
     var showToolZMin = false;
     if (showToolZMin) {
       if (is3D()) {
@@ -445,7 +449,7 @@ function onSection() {
     if (!machineConfiguration.isHeadConfiguration()) {
       writeBlock(
         gAbsIncModal.format(90),
-        gMotionModal.format(0), xOutput.format(initialPosition.x), yOutput.format(initialPosition.y)
+        gMotionModal.format(0), xOutput.format(initialPosition.x) + " + #5" + tool.number +"]", yOutput.format(initialPosition.y)
       );
       writeBlock(gMotionModal.format(0), gFormat.format(43) ,zOutput.format(initialPosition.z), hFormat.format(lengthOffset));
     } else {
@@ -494,7 +498,7 @@ function onRapid(_x, _y, _z) {
       error(localize("Radius compensation mode cannot be changed at rapid traversal."));
       return;
     }
-    writeBlock(gMotionModal.format(0), x, y, z);
+    writeBlock(gMotionModal.format(0), x  + " + #5" + tool.number +"]", y, z);
     feedOutput.reset();
   }
 }
@@ -514,9 +518,12 @@ function onLinear(_x, _y, _z, feed) {
     if (pendingRadiusCompensation >= 0) {
       error(localize("Radius compensation mode is not supported."));
       return;
+    } else if (x){
+      writeBlock(gMotionModal.format(1), x + " + #5" + tool.number +"]", y, z, f);
     } else {
-      writeBlock(gMotionModal.format(1), x, y, z, f);
+      writeBlock(gMotionModal.format(1), y, z, f);  
     }
+
   } else if (f) {
     if (getNextRecord().isMotion()) { // try not to output feed without motion
       feedOutput.reset(); // force feed on next line

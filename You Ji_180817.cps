@@ -32,7 +32,7 @@ minimumRevision = 40783;
 
 longDescription = "Samsung lathe (Fanuc) with support for mill-turn.";
 
-extension = "";
+extension = ".NC";
 programNameIsInteger = true;
 setCodePage("ascii");
 
@@ -649,8 +649,8 @@ function onOpen() {
   var delta = Vector.diff(workpiece.upper, workpiece.lower);
   
   if (delta.isNonZero()) {
-    writeComment("STOCK MIN X" + yFormat.format(workpiece.lower.x) + " Y" + yFormat.format(workpiece.lower.y) + " Z" + zFormat.format(workpiece.lower.z));
-    writeComment("STOCK MAX X" + yFormat.format(workpiece.upper.x) + " Y" + yFormat.format(workpiece.upper.y) + " Z" + zFormat.format(workpiece.upper.z));
+    //writeComment("STOCK MIN X" + yFormat.format(workpiece.lower.x) + " Y" + yFormat.format(workpiece.lower.y) + " Z" + zFormat.format(workpiece.lower.z));
+    //writeComment("STOCK MAX X" + yFormat.format(workpiece.upper.x) + " Y" + yFormat.format(workpiece.upper.y) + " Z" + zFormat.format(workpiece.upper.z));
   }  
 
   // dump tool information
@@ -1648,8 +1648,8 @@ function onSection() {
         cOutput.format(getC(initialPosition.x, initialPosition.y))
       );
     } else {
-      writeBlock(gMotionModal.format(0), zOutput.format(initialPosition.z));
       writeBlock(gMotionModal.format(0), xOutput.format(initialPosition.x), yOutput.format(initialPosition.y));
+      writeBlock(gMotionModal.format(0), zOutput.format(initialPosition.z));
     }
   }
 
@@ -1923,8 +1923,8 @@ function goHome(forceY) {
       setYAxisMode(true);
       var yAxis = "V" + yFormat.format(0);
     }
-    writeBlock(gMotionModal.format(0), gFormat.format(28), "U" + xFormat.format(0), yAxis);
-    writeBlock(gMotionModal.format(0), gFormat.format(28), "W" + zFormat.format(0));
+    writeBlock(gMotionModal.format(0), gFormat.format(28), "W" + zFormat.format(0), yAxis);
+    writeBlock(gMotionModal.format(0), gFormat.format(28), "U" + xFormat.format(0));
   } else {
     if (gotYAxis && (yAxisIsEnabled || forceY)) {
       setYAxisMode(true);
@@ -1936,8 +1936,8 @@ function goHome(forceY) {
       "Z" + zFormat.format((getSpindle(true) == SPINDLE_MAIN) ? properties.g53HomePositionZ : properties.g53HomePositionSubZ)
      );
     writeBlock(gMotionModal.format(0), gFormat.format(53), "X" + xFormat.format(properties.g53HomePositionX), yAxis);*/
+    writeBlock(gMotionModal.format(0), gFormat.format(30), "W" + zFormat.format(0));     
     writeBlock(gMotionModal.format(0), gFormat.format(30), "U" + xFormat.format(0)); 
-    writeBlock(gMotionModal.format(0), gFormat.format(30), "W" + xFormat.format(0)); 
   }
 }
 
@@ -3550,7 +3550,9 @@ function onClose() {
   gMotionModal.reset();
 
   // Move to home position
-  goHome(true);
+  //goHome(true);
+  writeBlock(gFormat.format(28), "U" + abcFormat.format(0), "W" + abcFormat.format(0));
+
   if (machineState.tailstockIsActive) {
     writeBlock(mFormat.format(getCode("TAILSTOCK_OFF", SPINDLE_MAIN)));
   }

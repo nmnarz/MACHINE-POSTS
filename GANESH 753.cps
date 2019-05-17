@@ -32,7 +32,7 @@ minimumChordLength = spatial(0.25, MM);
 minimumCircularRadius = spatial(0.01, MM);
 maximumCircularRadius = spatial(1000, MM);
 minimumCircularSweep = toRad(0.01);
-maximumCircularSweep = toRad(180);
+maximumCircularSweep = toRad(90);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular motion
 allowSpiralMoves = true;
@@ -53,7 +53,7 @@ properties = {
   separateWordsWithSpace: true, // specifies that the words should be separated with a white space
   allow3DArcs: false, // specifies that 3D circular arcs are allowed
   useRadius: false, // specifies that arcs should be output using the radius (R word) instead of the I, J, and K words
-  forceIJK: false, // force output of IJK for G2/G3 when not using R word
+  forceIJK: true, // force output of IJK for G2/G3 when not using R word
   useParametricFeed: false, // specifies that feed should be output using Q values
   showNotes: false, // specifies that operation notes should be output
   useSmoothing: false, // specifies if smoothing should be used or not
@@ -1112,7 +1112,7 @@ function onSection() {
   var insertToolCall = forceToolAndRetract || isFirstSection() ||
     currentSection.getForceToolChange && currentSection.getForceToolChange() ||
     (tool.number != getPreviousSection().getTool().number);
-  insertToolCall = true; //always post tool change for operations
+  //insertToolCall = true; //always post tool change for operations
 
   var zIsOutput = false; // true if the Z-position has been output, used for patterns
 
@@ -1127,18 +1127,20 @@ function onSection() {
   var forceSmoothing =  properties.useSmoothing &&
     (hasParameter("operation-strategy") && (getParameter("operation-strategy") == "drill") ||
     !isFirstSection() && getPreviousSection().hasParameter("operation-strategy") && (getPreviousSection().getParameter("operation-strategy") == "drill")); // force smoothing in case !insertToolCall (2d chamfer)
-  if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
+  /*if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
     if (!isFirstSection() && tool.number == getPreviousSection().getTool().number && !newWorkOffset && !newWorkPlane && !forceSmoothing){
 
       // stop spindle before retract during tool change
       if (insertToolCall && !isFirstSection() && !manualNCStop) {
-        writeOptionalBlock("M05");
-        writeOptionalBlock("M09");         
+        //writeOptionalBlock("M05");
+        //writeOptionalBlock("M09");         
+        onCommand(COMMAND_STOP_SPINDLE); 
+        onCommand(COMMAND_COOLANT_OFF);    
       }
 
       // retract to safe plane
       if(!manualNCStop){
-      writeRetract2(Z); // retract
+      writeRetract(Z); // retract
       }
       forceXYZ();
       if ((insertToolCall && !isFirstSection()) || forceSmoothing) {
@@ -1162,7 +1164,25 @@ function onSection() {
         setSmoothing(false);      
       }
     }
-  }  
+  }  */
+  if (insertToolCall || newWorkOffset || newWorkPlane || forceSmoothing) {
+    
+    // stop spindle before retract during tool change
+    if (insertToolCall && !isFirstSection() && !manualNCStop) {
+      onCommand(COMMAND_STOP_SPINDLE); 
+      onCommand(COMMAND_COOLANT_OFF);           
+    }
+    
+    // retract to safe plane
+    if(!manualNCStop){
+      writeRetract(Z); // retract
+    }
+    forceXYZ();
+    if ((insertToolCall && !isFirstSection()) || forceSmoothing) {
+      disableLengthCompensation();  
+      setSmoothing(false);
+    }
+  }
 
   if (hasParameter("operation-comment")) {
     var comment = getParameter("operation-comment");

@@ -32,7 +32,7 @@ minimumCircularSweep = toRad(0.01);
 maximumCircularSweep = toRad(359);
 allowHelicalMoves = true;
 allowedCircularPlanes = undefined; // allow any circular movements
-allowSpiralMoves = true;
+//allowSpiralMoves = true;
 highFeedMapping = HIGH_FEED_NO_MAPPING; // must be set if axes are not synchronized
 highFeedrate = (unit == IN) ? 100 : 5000;
 
@@ -53,9 +53,9 @@ properties = {
   showNotes: false, // specifies that operation notes should be output.
   useG16: false, // use G16 for machine retracts in H0
   useFixtureOffsetFunction: false, // specifies to use CALL OO88 for 3+1 machining
-  firstAutosetNumber: 20, //First used Autoset number
+  firstAutosetNumber: 21, //First used Autoset number
   autosetBAngle: 0, //sets the B angle rotation for all autosets
-  numberOfAutosets: 5, //How many autosets are used at top of program
+  numberOfAutosets: 1, //How many autosets are used at top of program
 };
 
 
@@ -358,18 +358,31 @@ function onOpen() {
     writeBlock("(TOMBSTONE SETUP B ANGLE)" + "VC1=" + properties.autosetBAngle)
   }
   
-  if (properties.useFixtureOffsetFunction){
+  /*if (properties.useFixtureOffsetFunction){
     writeBlock("VZOFX[200]=0.");
     writeBlock("VZOFY[200]=0.");
     writeBlock("VZOFZ[200]=-9.8425");
     writeBlock("VZOFB[200]=VC1");  
-  }
-
+  }*/
+  if (properties.useFixtureOffsetFunction) {
   for (var i = 0; i < properties.numberOfAutosets; i++) {
     writeBlock("VZOFX[" + (properties.firstAutosetNumber + i) + "]=0.");
+    writeBlock("VZOFX[" + (100 + properties.firstAutosetNumber + i) + "]=0.");
     writeBlock("VZOFY[" + (properties.firstAutosetNumber + i) + "]=0.");
+    writeBlock("VZOFY[" + (100 + properties.firstAutosetNumber + i) + "]=0.");
     writeBlock("VZOFZ[" + (properties.firstAutosetNumber + i) + "]=-9.8425");
-    writeBlock("VZOFB[" + (properties.firstAutosetNumber + i) + "]=VC1");       
+    writeBlock("VZOFZ[" + (100 + properties.firstAutosetNumber + i) + "]=-9.8425");
+    writeBlock("VZOFB[" + (properties.firstAutosetNumber + i) + "]=VC1");
+    writeBlock("VZOFB[" + (100 + properties.firstAutosetNumber + i) + "]=VC1");        
+    }
+  }
+  else {
+    for (var i = 0; i < properties.numberOfAutosets; i++) {
+      writeBlock("VZOFX[" + (properties.firstAutosetNumber + i) + "]=0.");
+      writeBlock("VZOFY[" + (properties.firstAutosetNumber + i) + "]=0.");
+      writeBlock("VZOFZ[" + (properties.firstAutosetNumber + i) + "]=-9.8425");
+      writeBlock("VZOFB[" + (properties.firstAutosetNumber + i) + "]=VC1");  
+    }
   }
 
   // absolute coordinates and feed per min
@@ -685,7 +698,7 @@ function onSection() {
   var insertToolCall = forceToolAndRetract || isFirstSection() ||
     currentSection.getForceToolChange && currentSection.getForceToolChange() ||
     (tool.number != getPreviousSection().getTool().number);
-    //insertToolCall = true; //always post tool change for operations
+    insertToolCall = true; //always post tool change for operations
   
   retracted = false; // specifies that the tool has been retracted to the safe plane
   var newWorkOffset = isFirstSection() ||
@@ -1140,7 +1153,7 @@ function onCyclePoint(x, y, z) {
       }
       // K is retract amount
       writeBlock(
-        gPlaneModal.format(17), gAbsIncModal.format(90), gCycleModal.format((tool.type == TOOL_TAP_LEFT_HAND ? 273 : 283)),
+        gPlaneModal.format(17), gAbsIncModal.format(90), gCycleModal.format((tool.type == TOOL_TAP_LEFT_HAND ? 272 : 282)),
         gFeedModeModal.format(95), // feed per revolution
         getCommonCycle(x, y, z, cycle.retract),
         conditional(P > 0, "P" + secFormat.format(P/1000.0)),
