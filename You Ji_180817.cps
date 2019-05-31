@@ -3426,7 +3426,7 @@ function ejectPart() {
   }
   writeBlock(
     gFeedModeModal.format(getCode("FEED_MODE_MM_MIN", getSpindle(false))),
-    gFormat.format(53 + currentWorkOffset),
+    gFormat.format(54 + currentWorkOffset),
     gPlaneModal.format(17),
     cAxisEngageModal.format(getCode("DISABLE_C_AXIS", getSpindle(true)))
   );
