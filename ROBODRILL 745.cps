@@ -205,6 +205,7 @@ var cycleSubprogramIsActive = false;
 var patternIsActive = false;
 var lastOperationComment = "";
 var sequenceNumberForToolChange;
+var incrementalSubprogram;
 
 /**
   Writes the specified block.
@@ -880,6 +881,11 @@ function areSpatialBoxesTranslated(_box1, _box2) {
     !areSpatialVectorsDifferent(Vector.diff(_box2[0], _box1[0]), Vector.diff(_box2[1], _box1[1]));
 }
 
+/** Returns true if the spatial boxes are same. */
+function areSpatialBoxesSame(_box1, _box2) {
+  return !areSpatialVectorsDifferent(_box1[0], _box2[0]) && !areSpatialVectorsDifferent(_box1[1], _box2[1]);
+}
+
 function subprogramDefine(_initialPosition, _abc, _retracted, _zIsOutput) {
   // convert patterns into subprograms
   var usePattern = false;
@@ -923,7 +929,8 @@ function subprogramDefine(_initialPosition, _abc, _retracted, _zIsOutput) {
       patternIsActive = true;
 
       if (firstPattern) {
-        subprogramStart(_initialPosition, _abc, true);
+        //subprogramStart(_initialPosition, _abc, true);
+        subprogramStart(_initialPosition, _abc, incrementalSubprogram);
       } else {
         skipRemainingSection();
         setCurrentPosition(getFramePosition(currentSection.getFinalPosition()));
@@ -971,7 +978,7 @@ function subprogramDefine(_initialPosition, _abc, _retracted, _zIsOutput) {
     currentSubprogram = ++lastSubprogram;
     writeBlock(mFormat.format(98), "P" + oFormat.format(currentSubprogram));
     firstPattern = true;
-    subprogramStart(_initialPosition, _abc, false);
+    subprogramStart(_initialPosition, _abc, false); 
   }
 }
 
@@ -1021,6 +1028,7 @@ function subprogramIsValid(_section, _patternId, _patternType) {
 
   var rotation = getRotation();
   var translation = getTranslation();
+  incrementalSubprogram = undefined;
 
   for (var i = 0; i < numberOfSections; ++i) {
     var section = getSection(i);
@@ -1037,9 +1045,13 @@ function subprogramIsValid(_section, _patternId, _patternType) {
           patternBox[0] = getFramePosition(tempBox[0]);
           patternBox[1] = getFramePosition(tempBox[1]);
 
-          if (!areSpatialBoxesTranslated(masterPosition, patternPosition) || !areSpatialBoxesTranslated(masterBox, patternBox)) {
+          if (areSpatialBoxesSame(masterPosition, patternPosition) && areSpatialBoxesSame(masterBox, patternBox)) {
+            incrementalSubprogram = incrementalSubprogram ? incrementalSubprogram : false;
+          } else if (!areSpatialBoxesTranslated(masterPosition, patternPosition) || !areSpatialBoxesTranslated(masterBox, patternBox)) {
             validSubprogram = false;
             break;
+          } else {
+            incrementalSubprogram = true;
           }
         }
 
